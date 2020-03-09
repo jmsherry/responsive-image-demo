@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Images</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/picturefill/3.0.3/picturefill.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>srcset, sizes & &lt;picture&gt;</h1>
+  </header>
+  <main>
+    <h2><code>srcset</code> attribute: Different sized sources</h2>
+    <p>So at the moment, you can make your images responsive/fluid. You can make them cover or contain, etc. BUT
+      whatever
+      you do you can only download the same initial image src. That means that on a mobile you're downloading an image
+      which is required for desktop.
+      This is inefficient and costs the user time, data &amp; bandwidth</p>
+    <p>You <em>can</em> use image services, if you have access to them BUT it's still the same one image you can load.
+    </p>
+    <p>For background images you can use media queries to differentiate, but what about foreground images?</p>
+    <p>Question: Is there a way of serving different images to devices with different screensizes? Answer: Yes. Meet the
+      <code>srcset</code> attribute!</p>
+
+    <code>
+    <pre>&lt;img src="cat.jpg" alt="cat" srcset="
+                             cat_600.jpg 600w,
+                             cat_960jpg 900w,
+                             cat_1280.jpg 1280w"&gt;</pre>
+  </code>
+    <p>...gives you:</p>
+    <!-- <img src="https://via.placeholder.com/300/09f/fff.png" alt="Cat"
+      srcset="https://via.placeholder.com/600/09f/fff.png 600w, https://via.placeholder.com/900/09f/fff.png 900w, https://via.placeholder.com/1280/09f/fff.png 1280w"> -->
+    <img src="/images/blue-300.png" alt="Cat"
+      srcset="/images/blue-600.png 600w, /images/blue-900.png 900w, /images/blue-1280.png 1280w">
+    <ul>
+      <li>The <code>&lt;number&gt;w</code> is the <strong>image's inherent width in px. </strong></li>
+      <li><strong>You should always include the original src attribute for browsers that don't support srcset.</strong>
+      </li>
+      <li>The browser makes intelligent guesses. It may take into account your screen resolution without asking!</li>
+    </ul>
+    <hr>
+    <h2><code>sizes</code> attribute: For when the image will be different sizes on the page at different screen sizes
+    </h2>
+    <p>This gives the image options as to what to load depending on the screensize. But, that assumes that the image
+      will
+      take the full screen width. What if the image is only half the size? Enter the <code>sizes</code> attribute:</p>
+    <code>
+    <pre>&lt;img src="cat.jpg" alt="cat" srcset="
+                             cat_600.jpg 600w,
+                             cat_960jpg 900w,
+                             cat_1280.jpg 1280w"
+                             
+                             sizes="(max-width: 320px) 280px,
+                                    (max-width: 480px) 440px,
+                                    800px"&gt;</pre>
+  </code>
+    <img src="/images/red-300.png" alt="Cat"
+      srcset="/images/red-600.png 600w, /images/red-900.png 900w, /images/red-1280.png 1280w" sizes="(max-width: 601px) 600px,
+                                    (max-width: 960px) 900px,
+                                    1280px">
+    <ul>
+      <li>The last value (the 800px) is a 'fallback value' it is the value that the browser accepts if no other media
+        conditions above are met.</li>
+      <li>The browser goes through the sizes list in order. If the screen width was 350px then is would bypass the first
+        condition and head to the second, believing that the image would take up around 440px. It would then do some
+        intelligent guesses as to what
+        to download as a src (probably cat_600.jpg)</li>
+      <li>The measurement you give after the query can be an absolute size (e.g. px) or a viewport size (e.g. 10vw) but
+        <strong>NOT a percentage</strong> and is a representation of what size you think the image will be when
+        rendered.
+      </li>
+    </ul>
+
+    <hr>
+
+    <h2>Resolution Switching: Same Size, Different Resolutions</h2>
+    <code>
+    <pre>&lt;img src="cat.jpg" alt="cat" srcset="
+                             cat_600.jpg,
+                             cat_960jpg 2x,
+                             cat_1280.jpg 3x"&gt;</pre>
+  </code>
+    <p>(Not as useful)</p>
+    <hr>
+    <h2>The &lt;picture&gt; element: Serving Differential Image Formats &amp; Art Direction</h2>
+
+    <blockquote>To recap, the art direction problem involves wanting to change the image displayed to suit different
+      image
+      display sizes. For example, a web page includes a large landscape shot with a person in the middle when viewed on
+      a
+      desktop browser. When viewed
+      on a mobile browser, that same image is shrunk down, making the person in the image very small and hard to see. It
+      would probably be better to show a smaller, portrait image on mobile, which zooms in on the person. The
+      &lt;picture&gt; element allows
+      us to implement just this kind of solution.
+      <cite><abbr title="Mozilla Developer Network">MDN</abbr></cite></blockquote>
+
+    <code>
+    <pre>
+    &lt;picture&gt;
+      &lt;source media="(max-width: 799px)"
+      srcset="https://picsum.photos/id/237/200/300.jpg"&gt;
+      
+      &lt;source media="(min-width: 800px)"
+      srcset="https://picsum.photos/id/238/200/300.jpg"&gt;
+      
+      &lt;img src="https://picsum.photos/id/237/200/300.jpg" alt="Thing"&gt;
+      
+    &lt;/picture&gt;
+  </pre>
+  </code>
+
+    <div>
+      <picture>
+        <source media="(max-width: 799px)" srcset="https://picsum.photos/id/237/200/300.jpg">
+        <source media="(min-width: 800px)" srcset="https://picsum.photos/id/238/200/300.jpg">
+        <img src="https://picsum.photos/id/237/200/300.jpg" alt="Thing">
+      </picture>
+    </div>
+
+    <footer>
+      <p><a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">MDN
+          reference</a></p>
+    </footer>
+
+  </main>
+</body>
+
+</html>
